@@ -17,9 +17,13 @@ public interface PerunResources extends ClientBundle {
 	@Source("perun.png")
 	ImageResource getPerunLogo();
 
-	@Source("PerunWui.css")
+	/*@Source("PerunWui.css")
 	@CssResource.NotStrict
-	public CssResource css();
+	public CssResource css();*/
+        
+        @Source("PerunWui.gss")
+        @CssResource.NotStrict
+	public CssResource gss();
 
 	@Source("perun-ico.png")
 	public ImageResource getPerunIcon();
