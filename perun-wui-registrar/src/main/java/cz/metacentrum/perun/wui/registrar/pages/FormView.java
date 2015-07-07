@@ -12,6 +12,8 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.ViewImpl;
 import cz.metacentrum.perun.wui.client.resources.PerunSession;
 import cz.metacentrum.perun.wui.client.utils.Utils;
 import cz.metacentrum.perun.wui.json.JsonEvents;
@@ -19,7 +21,6 @@ import cz.metacentrum.perun.wui.json.managers.RegistrarManager;
 import cz.metacentrum.perun.wui.model.BasicOverlayObject;
 import cz.metacentrum.perun.wui.model.PerunException;
 import cz.metacentrum.perun.wui.model.beans.*;
-import cz.metacentrum.perun.wui.pages.Page;
 import cz.metacentrum.perun.wui.registrar.client.RegistrarTranslation;
 import cz.metacentrum.perun.wui.registrar.model.RegistrarObject;
 import cz.metacentrum.perun.wui.registrar.widgets.PerunForm;
@@ -33,16 +34,14 @@ import java.util.Collections;
 import java.util.Comparator;
 
 /**
- * Page to display application form for VO or Group.
+ * View for displaying registration form of VO / Group
  *
  * @author Pavel Zlámal <zlamal@cesnet.cz>
  */
-public class FormPage extends Page {
+public class FormView extends ViewImpl implements FormPresenter.MyView {
 
-	interface FormPageUiBinder extends UiBinder<Widget, FormPage> {
+	interface FormViewUiBinder extends UiBinder<Widget, FormView> {
 	}
-
-	private static FormPageUiBinder ourUiBinder = GWT.create(FormPageUiBinder.class);
 
 	private RegistrarTranslation translation = GWT.create(RegistrarTranslation.class);
 
@@ -58,32 +57,15 @@ public class FormPage extends Page {
 	@UiField
 	Alert notice;
 
-	private Widget rootElement;
 	private PerunException displayedException;
 
-	public FormPage() {
-
-		rootElement = ourUiBinder.createAndBindUi(this);
-
+	@Inject
+	public FormView(FormViewUiBinder binder) {
+		initWidget(binder.createAndBindUi(this));
+		draw();
 	}
 
-	@Override
-	public boolean isPrepared() {
-		return true;
-	}
-
-	@Override
-	public boolean isAuthorized() {
-		return true;
-	}
-
-	@Override
-	public void onResize() {
-
-	}
-
-	@Override
-	public Widget draw() {
+	public void draw() {
 
 		final PerunLoader loader = new PerunLoader();
 		form.add(loader);
@@ -101,7 +83,7 @@ public class FormPage extends Page {
 		if (voName == null || voName.isEmpty()) {
 			this.displayedException = PerunException.createNew("0", "WrongURL", "Missing parameters in URL.");
 			displayException(loader, displayedException);
-			return rootElement;
+			return;
 		}
 
 		RegistrarManager.initializeRegistrar(voName, groupName, new JsonEvents() {
@@ -258,40 +240,6 @@ public class FormPage extends Page {
 			}
 		});
 
-		return rootElement;
-
-	}
-
-	@Override
-	public Widget getWidget() {
-		return rootElement;
-	}
-
-	@Override
-	public void open() {
-
-	}
-
-	@Override
-	public String getUrl() {
-		return "form";
-	}
-
-	@Override
-	public void toggleHelp() {
-
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		return true;
-	}
-
-	@Override
-	public int hashCode() {
-		return 31;
 	}
 
 	private void displayException(PerunLoader loader, PerunException ex) {
