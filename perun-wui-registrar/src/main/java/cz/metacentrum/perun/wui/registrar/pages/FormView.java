@@ -166,10 +166,8 @@ public class FormView extends ViewImpl implements FormPresenter.MyView {
 					if (registrar.getException().getName().equals("VoNotExistsException") ||
 							registrar.getException().getName().equals("GroupNotExistsException") ||
 							registrar.getException().getName().equals("FormNotExistsException")) {
-						if (loader != null) {
-							loader.onFinished();
-							loader.removeFromParent();
-						}
+						loader.onFinished();
+						loader.removeFromParent();
 						resolveException(registrar.getException());
 
 						return;
@@ -183,6 +181,12 @@ public class FormView extends ViewImpl implements FormPresenter.MyView {
 						}
 					});
 
+				} else if (registrar.getGroupFormInitial().isEmpty()) {
+					loader.onFinished();
+					loader.removeFromParent();
+					resolveException(PerunException.createNew("0", "FormNotExistsException",
+							"Registration form to group \""+group.getName()+"\" is incorrectly created. It is empty."));
+					return;
 				} else {
 
 					loader.onFinished();
